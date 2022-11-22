@@ -25,11 +25,26 @@ inpainting-1.5:
   config: configs/stable-diffusion/v1-inpainting-inference.yaml
   vae: models/ldm/stable-diffusion-v1/vae-ft-mse-840000-ema-pruned.ckpt
   description: RunwayML SD 1.5 model optimized for inpainting
-pvh_bag_1-stable-diffusion-1.4:
+pvh_bag_1:
   description: Stable Diffusion inference model version 1.4
   config: configs/stable-diffusion/v1-inference.yaml
   weights: models/ldm/stable-diffusion-v1/pvh_bag_1_model.ckpt
   vae: models/ldm/stable-diffusion-v1/vae-ft-mse-840000-ema-pruned.ckpt
   width: 512
   height: 512
+pvh_bag_2:
+  description: Stable Diffusion inference model version 1.4
+  config: configs/stable-diffusion/v1-inference.yaml
+  weights: models/ldm/stable-diffusion-v1/pvh_bag_2_model.ckpt
+  vae: models/ldm/stable-diffusion-v1/vae-ft-mse-840000-ema-pruned.ckpt
+  width: 512
+  height: 512
+pvh_shoes_1:
+  description: Stable Diffusion inference model version 1.4
+  config: configs/stable-diffusion/v1-inference.yaml
+  weights: models/ldm/stable-diffusion-v1/pvh_shoes_1_model.ckpt
+  vae: models/ldm/stable-diffusion-v1/vae-ft-mse-840000-ema-pruned.ckpt
+  width: 512
+  height: 512
+
 
