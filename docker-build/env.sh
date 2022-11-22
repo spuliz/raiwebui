@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-project_name=${PROJECT_NAME:-invokeai}
+project_name=${PROJECT_NAME:-raiwebui}
 volumename=${VOLUMENAME:-${project_name}_data}
 arch=${ARCH:-x86_64}
 platform=${PLATFORM:-Linux/${arch}}
