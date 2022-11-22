@@ -55,6 +55,9 @@ RUN git clone -b ${invokeai_branch} https://github.com/${invokeai_git}.git "/${p
   /data/models/v1-5-pruned-emaonly.ckpt \
   "/${project_name}/models/ldm/stable-diffusion-v1/v1-5-pruned-emaonly.ckpt" \
   && ln -sf \
+  /data/models/pvh_bag_1_model.ckpt \
+  "/${project_name}/models/ldm/stable-diffusion-v1/pvh_bag_1_model.ckpt" \
+  && ln -sf \
   /data/outputs/ \
   "/${project_name}/outputs"
 

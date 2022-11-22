@@ -12,4 +12,5 @@ docker run \
   --hostname "$project_name" \
   --mount source="$volumename",target=/data \
   --publish 9090:9090 \
+  --gpus all \
   "$invokeai_tag" ${1:+$@}
