@@ -41,7 +41,6 @@ RUN apt-get update \
 
 # clone repository, create models.yaml and create symlinks
 ARG invokeai_git=spuliz/raiwebui
-
 ARG invokeai_branch=main
 ARG project_name=raiwebui
 ARG conda_env_file=environment-lin-cuda.yml
