@@ -76,7 +76,7 @@ else
 fi
 
 # Build Container
-docker build \
+docker build --no-cache \
   --platform="${platform}" \
   --tag "${invokeai_tag}" \
   --build-arg project_name="${project_name}" \

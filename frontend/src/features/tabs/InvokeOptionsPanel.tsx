@@ -15,7 +15,7 @@ import {
   setShouldShowOptionsPanel,
 } from '../options/optionsSlice';
 import { setNeedsCache } from './Inpainting/inpaintingSlice';
-import InvokeAILogo from '../../assets/images/logo.png';
+import RocketAILogo from '../../assets/images/logo.png';
 
 type Props = { children: ReactNode };
 
@@ -166,7 +166,7 @@ const InvokeOptionsPanel = (props: Props) => {
             </Tooltip>
             {!shouldPinOptionsPanel && (
               <div className="invoke-ai-logo-wrapper">
-                <img src={InvokeAILogo} alt="invoke-ai-logo" />
+                <img src={RocketAILogo} alt="rocket-ai-logo" />
                 <h1>
                   invoke <strong>ai</strong>
                 </h1>
