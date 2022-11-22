@@ -44,6 +44,11 @@ _copyCheckpoints() {
     --header="Authorization: Bearer ${huggingface_token}" \
     -O models/v1-5-pruned-emaonly.ckpt \
     https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.ckpt
+  echo "downloading pvh_bag_1_model.ckpt"
+  _runAlpine wget \
+    --header="Authorization: Bearer ${huggingface_token}" \
+    -O models/pvh_bag_1_model.ckpt \
+    https://huggingface.co/rocketai/pvh_bag_1/resolve/main/model.ckpt
   echo "done"
 }
 
