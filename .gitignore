@@ -195,7 +195,7 @@ checkpoints
 # Let the frontend manage its own gitignore
 !frontend/*
 frontend/apt-get
-frontend/dist
+#frontend/dist
 frontend/sudo
 frontend/update
 
