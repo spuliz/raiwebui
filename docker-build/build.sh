@@ -49,7 +49,7 @@ _copyCheckpoints() {
     --header="Authorization: Bearer ${huggingface_token}" \
     -O models/pvh_bag_1_model.ckpt \
     https://huggingface.co/rocketai/pvh_bag_1/resolve/main/model.ckpt
-    echo "downloading pvh_bag_2_model.ckpt"
+  echo "downloading pvh_bag_2_model.ckpt"
   _runAlpine wget \
     --header="Authorization: Bearer ${huggingface_token}" \
     -O models/pvh_bag_2_model.ckpt \
