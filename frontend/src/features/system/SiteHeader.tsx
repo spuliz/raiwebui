@@ -12,7 +12,7 @@ import {
   FaWrench,
 } from 'react-icons/fa';
 
-import InvokeAILogo from '../../assets/images/logo.png';
+import RocketAILogo from '../../assets/images/logo.png';
 import IAIIconButton from '../../common/components/IAIIconButton';
 
 import HotkeysModal from './HotkeysModal/HotkeysModal';
@@ -37,9 +37,9 @@ const SiteHeader = () => {
   return (
     <div className="site-header">
       <div className="site-header-left-side">
-        <img src={InvokeAILogo} alt="invoke-ai-logo" />
+        <img src={RocketAILogo} alt="rocket-ai-logo" />
         <h1>
-          invoke <strong>ai</strong>
+          Rocket <strong>AI</strong>
         </h1>
       </div>
 
