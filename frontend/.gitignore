@@ -10,7 +10,7 @@ lerna-debug.log*
 node_modules
 # We want to distribute the repo
 # dist
-dist-ssr
+# dist-ssr
 *.local
 
 # Editor directories and files
