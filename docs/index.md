@@ -82,9 +82,18 @@ Mac and Linux machines, and runs on GPU cards with as little as 4 GB or RAM.
 
 This fork is supported across Linux, Windows and Macintosh. Linux
 users can use either an Nvidia-based card (with CUDA support) or an
-AMD card (using the ROCm driver). For full installation and upgrade
-instructions, please see:
-[InvokeAI Installation Overview](https://invoke-ai.github.io/InvokeAI/installation/)
+AMD card (using the ROCm driver).
+
+First time users, please see [Automated
+Installer](installation/INSTALL_AUTOMATED.md) for a walkthrough of
+getting InvokeAI up and running on your system. For alternative
+installation and upgrade instructions, please see: [InvokeAI
+Installation Overview](installation/)
+
+Linux users who wish to make use of the PyPatchMatch inpainting
+functions will need to perform a bit of extra work to enable this
+module. Instructions can be found at [Installing
+PyPatchMatch](installation/INSTALL_PATCHMATCH.md).
 
 ## :fontawesome-solid-computer: Hardware Requirements
 
@@ -96,21 +105,24 @@ You wil need one of the following:
 - :simple-amd: An AMD-based graphics card with 4 GB or more VRAM memory (Linux only)
 - :fontawesome-brands-apple: An Apple computer with an M1 chip.
 
+We do **not recommend** the following video cards due to issues with
+their running in half-precision mode and having insufficient VRAM to
+render 512x512 images in full-precision mode:
+
+- NVIDIA 10xx series cards such as the 1080ti
+- GTX 1650 series cards
+- GTX 1660 series cards
+
 ### :fontawesome-solid-memory: Memory
 
 - At least 12 GB Main Memory RAM.
 
 ### :fontawesome-regular-hard-drive: Disk
 
-- At least 12 GB of free disk space for the machine learning model, Python, and
+- At least 18 GB of free disk space for the machine learning model, Python, and
   all its dependencies.
 
 !!! info
-
-    If you are have a Nvidia 10xx series card (e.g. the 1080ti), please run the invoke script in
-    full-precision mode as shown below.
-
-    Similarly, specify full-precision mode on Apple M1 hardware.
 
     Precision is auto configured based on the device. If however you encounter errors like
     `expected type Float but found Half` or `not implemented for Half` you can try starting
@@ -119,6 +131,27 @@ You wil need one of the following:
     ```bash
     (invokeai) ~/InvokeAI$ python scripts/invoke.py --full_precision
     ```
+## :octicons-gift-24: InvokeAI Features
+
+- [The InvokeAI Web Interface](features/WEB.md)
+    - [WebGUI hotkey reference guide](features/WEBUIHOTKEYS.md)
+    - [WebGUI Unified Canvas for Img2Img, inpainting and outpainting](features/UNIFIED_CANVAS.md)
+<!-- seperator -->
+- [The Command Line Interace](features/CLI.md)
+    - [Image2Image](features/IMG2IMG.md)
+    - [Inpainting](features/INPAINTING.md)
+    - [Outpainting](features/OUTPAINTING.md)
+    - [Adding custom styles and subjects](features/CONCEPTS.md)
+    - [Upscaling and Face Reconstruction](features/POSTPROCESS.md)
+<!-- seperator -->
+- [Generating Variations](features/VARIATIONS.md)
+<!-- seperator -->
+- [Prompt Engineering](features/PROMPTS.md)
+<!-- seperator -->
+- Miscellaneous
+    - [NSFW Checker](features/NSFW.md)
+    - [Embiggen upscaling](features/EMBIGGEN.md)
+    - [Other](features/OTHER.md)
 
 ## :octicons-log-16: Latest Changes
 
@@ -141,7 +174,7 @@ You wil need one of the following:
 - You can now load
   [multiple models and switch among them quickly](https://docs.google.com/presentation/d/1WywGA1rny7bpFh7CLSdTr4nNpVKdlUeT0Bj0jCsILyU/edit?usp=sharing)
   without leaving the CLI.
-- The installation process (via `scripts/preload_models.py`) now lets you select
+- The installation process (via `scripts/configure_invokeai.py`) now lets you select
   among several popular
   [Stable Diffusion models](https://invoke-ai.github.io/InvokeAI/installation/INSTALLING_MODELS/)
   and downloads and installs them on your behalf. Among other models, this

@@ -1,0 +1,130 @@
+name: Test invoke.py pip
+on:
+  push:
+    branches:
+      - 'main'
+      - 'development'
+  pull_request:
+    branches:
+      - 'main'
+      - 'development'
+
+jobs:
+  matrix:
+    strategy:
+      matrix:
+        stable-diffusion-model:
+          - stable-diffusion-1.5
+        requirements-file:
+          - requirements-lin-cuda.txt
+          - requirements-lin-amd.txt
+          - requirements-mac-mps-cpu.txt
+          - requirements-win-colab-cuda.txt
+        python-version:
+          # - '3.9'
+          - '3.10'
+        include:
+          - requirements-file: requirements-lin-cuda.txt
+            os: ubuntu-22.04
+            curl-command: curl
+            github-env: $GITHUB_ENV
+          - requirements-file: requirements-lin-amd.txt
+            os: ubuntu-22.04
+            curl-command: curl
+            github-env: $GITHUB_ENV
+          - requirements-file: requirements-mac-mps-cpu.txt
+            os: macOS-12
+            curl-command: curl
+            github-env: $GITHUB_ENV
+          - requirements-file: requirements-win-colab-cuda.txt
+            os: windows-2022
+            curl-command: curl.exe
+            github-env: $env:GITHUB_ENV
+          - stable-diffusion-model: stable-diffusion-1.5
+            stable-diffusion-model-url: https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.ckpt
+            stable-diffusion-model-dl-path: models/ldm/stable-diffusion-v1
+            stable-diffusion-model-dl-name: v1-5-pruned-emaonly.ckpt
+    name: ${{ matrix.requirements-file }} on ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout sources
+        id: checkout-sources
+        uses: actions/checkout@v3
+
+      - name: set INVOKEAI_ROOT Windows
+        if: matrix.os == 'windows-2022'
+        run: |
+          echo "INVOKEAI_ROOT=${{ github.workspace }}\invokeai" >> ${{ matrix.github-env }}
+          echo "INVOKEAI_OUTDIR=${{ github.workspace }}\invokeai\outputs" >> ${{ matrix.github-env }}
+
+      - name: set INVOKEAI_ROOT others
+        if: matrix.os != 'windows-2022'
+        run: |
+          echo "INVOKEAI_ROOT=${{ github.workspace }}/invokeai" >> ${{ matrix.github-env }}
+          echo "INVOKEAI_OUTDIR=${{ github.workspace }}/invokeai/outputs" >> ${{ matrix.github-env }}
+
+      - name: create models.yaml from example
+        run: |
+          mkdir -p ${{ env.INVOKEAI_ROOT }}/configs
+          cp configs/models.yaml.example ${{ env.INVOKEAI_ROOT }}/configs/models.yaml
+
+      - name: set test prompt to main branch validation
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: echo "TEST_PROMPTS=tests/preflight_prompts.txt" >> ${{ matrix.github-env }}
+
+      - name: set test prompt to development branch validation
+        if: ${{ github.ref == 'refs/heads/development' }}
+        run: echo "TEST_PROMPTS=tests/dev_prompts.txt" >> ${{ matrix.github-env }}
+
+      - name: set test prompt to Pull Request validation
+        if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/development' }}
+        run: echo "TEST_PROMPTS=tests/validate_pr_prompt.txt" >> ${{ matrix.github-env }}
+
+      - name: create requirements.txt
+        run: cp 'environments-and-requirements/${{ matrix.requirements-file }}' '${{ matrix.requirements-file }}'
+
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          # cache: 'pip'
+          # cache-dependency-path: ${{ matrix.requirements-file }}
+
+      # - name: install dependencies
+      #   run: ${{ env.pythonLocation }}/bin/pip install --upgrade pip setuptools wheel
+
+      - name: install requirements
+        run: pip3 install -r '${{ matrix.requirements-file }}'
+
+      - name: Use Cached Stable Diffusion Model
+        id: cache-sd-model
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-${{ matrix.stable-diffusion-model }}
+        with:
+          path: ${{ env.INVOKEAI_ROOT }}/${{ matrix.stable-diffusion-model-dl-path }}
+          key: ${{ env.cache-name }}
+
+      - name: Download ${{ matrix.stable-diffusion-model }}
+        id: download-stable-diffusion-model
+        if: ${{ steps.cache-sd-model.outputs.cache-hit != 'true' }}
+        run: |
+          mkdir -p "${{ env.INVOKEAI_ROOT }}/${{ matrix.stable-diffusion-model-dl-path }}"
+          ${{ matrix.curl-command }} -H "Authorization: Bearer ${{ secrets.HUGGINGFACE_TOKEN }}" -o "${{ env.INVOKEAI_ROOT }}/${{ matrix.stable-diffusion-model-dl-path }}/${{ matrix.stable-diffusion-model-dl-name }}" -L ${{ matrix.stable-diffusion-model-url }}
+
+      - name: run configure_invokeai.py
+        id: run-preload-models
+        run: python3 scripts/configure_invokeai.py --no-interactive --yes
+
+      - name: Run the tests
+        id: run-tests
+        if: matrix.os != 'windows-2022'
+        run: python3 scripts/invoke.py --no-patchmatch --no-nsfw_checker --model ${{ matrix.stable-diffusion-model }} --from_file ${{ env.TEST_PROMPTS }} --root="${{ env.INVOKEAI_ROOT }}" --outdir="${{ env.INVOKEAI_OUTDIR }}"
+
+      - name: Archive results
+        id: archive-results
+        if: matrix.os != 'windows-2022'
+        uses: actions/upload-artifact@v3
+        with:
+          name: results_${{ matrix.requirements-file }}_${{ matrix.python-version }}
+          path: ${{ env.INVOKEAI_ROOT }}/outputs

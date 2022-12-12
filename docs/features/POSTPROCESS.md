@@ -28,20 +28,16 @@ should "just work" without further intervention. Simply pass the `--upscale`
 the popup in the Web GUI.
 
 **GFPGAN** requires a series of downloadable model files to work. These are
-loaded when you run `scripts/preload_models.py`. If GFPAN is failing with an
+loaded when you run `scripts/configure_invokeai.py`. If GFPAN is failing with an
 error, please run the following from the InvokeAI directory:
 
 ```bash
-python scripts/preload_models.py
+python scripts/configure_invokeai.py
 ```
 
 If you do not run this script in advance, the GFPGAN module will attempt to
 download the models files the first time you try to perform facial
 reconstruction.
-
-## Usage
-
-You will now have access to two new prompt arguments.
 
 ### Upscaling
 
@@ -110,7 +106,7 @@ This repo also allows you to perform face restoration using
 [CodeFormer](https://github.com/sczhou/CodeFormer).
 
 In order to setup CodeFormer to work, you need to download the models like with
-GFPGAN. You can do this either by running `preload_models.py` or by manually
+GFPGAN. You can do this either by running `configure_invokeai.py` or by manually
 downloading the
 [model file](https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/codeformer.pth)
 and saving it to `ldm/invoke/restoration/codeformer/weights` folder.
@@ -119,7 +115,7 @@ You can use `-ft` prompt argument to swap between CodeFormer and the default
 GFPGAN. The above mentioned `-G` prompt argument will allow you to control the
 strength of the restoration effect.
 
-### Usage
+### CodeFormer Usage
 
 The following command will perform face restoration with CodeFormer instead of
 the default gfpgan.
@@ -160,7 +156,7 @@ A new file named `000044.2945021133.fixed.png` will be created in the output
 directory. Note that the `!fix` command does not replace the original file,
 unlike the behavior at generate time.
 
-### Disabling
+## How to disable
 
 If, for some reason, you do not wish to load the GFPGAN and/or ESRGAN libraries,
 you can disable them on the invoke.py command line with the `--no_restore` and

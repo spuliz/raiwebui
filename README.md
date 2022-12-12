@@ -1,10 +1,8 @@
 <div align="center">
 
+![project logo](docs/assets/invoke_ai_banner.png)
+
 # InvokeAI: A Stable Diffusion Toolkit
-
-_Formerly known as lstein/stable-diffusion_
-
-![project logo](docs/assets/logo.png)
 
 [![discord badge]][discord link]
 
@@ -38,18 +36,33 @@ This is a fork of
 [CompVis/stable-diffusion](https://github.com/CompVis/stable-diffusion),
 the open source text-to-image generator. It provides a streamlined
 process with various new features and options to aid the image
-generation process. It runs on Windows, Mac and Linux machines, with
+generation process. It runs on Windows, macOS and Linux machines, with
 GPU cards with as little as 4 GB of RAM. It provides both a polished
 Web interface (see below), and an easy-to-use command-line interface.
 
-**Quick links**: [<a href="https://discord.gg/ZmtBAhwWhy">Discord Server</a>] [<a href="https://invoke-ai.github.io/InvokeAI/">Documentation and Tutorials</a>] [<a href="https://github.com/invoke-ai/InvokeAI/">Code and Downloads</a>] [<a href="https://github.com/invoke-ai/InvokeAI/issues">Bug Reports</a>] [<a href="https://github.com/invoke-ai/InvokeAI/discussions">Discussion, Ideas & Q&A</a>]
+**Quick links**: [[How to Install](#installation)] [<a href="https://discord.gg/ZmtBAhwWhy">Discord Server</a>] [<a href="https://invoke-ai.github.io/InvokeAI/">Documentation and Tutorials</a>] [<a href="https://github.com/invoke-ai/InvokeAI/">Code and Downloads</a>] [<a href="https://github.com/invoke-ai/InvokeAI/issues">Bug Reports</a>] [<a href="https://github.com/invoke-ai/InvokeAI/discussions">Discussion, Ideas & Q&A</a>]
+
+_Note: InvokeAI is rapidly evolving. Please use the
+[Issues](https://github.com/invoke-ai/InvokeAI/issues) tab to report bugs and make feature
+requests. Be sure to use the provided templates. They will help us diagnose issues faster._
+
+# Getting Started with InvokeAI
+
+For full installation and upgrade instructions, please see:
+[InvokeAI Installation Overview](https://invoke-ai.github.io/InvokeAI/installation/)
+
+1. Go to the bottom of the [Latest Release Page](https://github.com/invoke-ai/InvokeAI/releases/tag/v2.2.3)
+2. Download the .zip file for your OS (Windows/macOS/Linux).
+3. Unzip the file. 
+4. If you are on Windows, double-click on the `install.bat` script. On macOS, open a Terminal window, drag the file `install.sh` from Finder into the Terminal, and press return. On Linux, run `install.sh`.
+5. Wait a while, until it is done. 
+6. The folder where you ran the installer from will now be filled with lots of files. If you are on Windows, double-click on the `invoke.bat` file. On macOS, open a Terminal window, drag `invoke.sh` from the folder into the Terminal, and press return. On Linux, run `invoke.sh`
+7. Press 2 to open the "browser-based UI", press enter/return, wait a minute or two for Stable Diffusion to start up, then open your browser and go to http://localhost:9090. 
+8. Type `banana sushi` in the box on the top left and click `Invoke`:
 
 <div align="center"><img src="docs/assets/invoke-web-server-1.png" width=640></div>
 
 
-_Note: This fork is rapidly evolving. Please use the
-[Issues](https://github.com/invoke-ai/InvokeAI/issues) tab to report bugs and make feature
-requests. Be sure to use the provided templates. They will help aid diagnose issues faster._
 
 ## Table of Contents
 
@@ -69,16 +82,23 @@ This fork is supported across Linux, Windows and Macintosh. Linux
 users can use either an Nvidia-based card (with CUDA support) or an
 AMD card (using the ROCm driver). For full installation and upgrade
 instructions, please see:
-[InvokeAI Installation Overview](https://invoke-ai.github.io/InvokeAI/installation/)
+[InvokeAI Installation Overview](https://invoke-ai.github.io/InvokeAI/installation/INSTALL_SOURCE/)
 
 ### Hardware Requirements
 
+InvokeAI is supported across Linux, Windows and macOS. Linux
+users can use either an Nvidia-based card (with CUDA support) or an
+AMD card (using the ROCm driver).
 #### System
 
 You wil need one of the following:
 
 - An NVIDIA-based graphics card with 4 GB or more VRAM memory.
 - An Apple computer with an M1 chip.
+
+We do not recommend the GTX 1650 or 1660 series video cards. They are
+unable to run in half-precision mode and do not have sufficient VRAM
+to render 512x512 images.
 
 #### Memory
 
@@ -97,11 +117,12 @@ Similarly, specify full-precision mode on Apple M1 hardware.
 
 Precision is auto configured based on the device. If however you encounter
 errors like 'expected type Float but found Half' or 'not implemented for Half'
-you can try starting `invoke.py` with the `--precision=float32` flag:
+you can try starting `invoke.py` with the `--precision=float32` flag to your initialization command
 
 ```bash
 (invokeai) ~/InvokeAI$ python scripts/invoke.py --precision=float32
 ```
+Or by updating your InvokeAI configuration file with this argument.
 
 ### Features
 
@@ -130,39 +151,7 @@ you can try starting `invoke.py` with the `--precision=float32` flag:
 
 ### Latest Changes
 
-- v2.0.1 (13 October 2022)
-  - fix noisy images at high step count when using k* samplers
-  - dream.py script now calls invoke.py module directly rather than
-    via a new python process (which could break the environment)
-
-- v2.0.0 (9 October 2022)
-
-  - `dream.py` script renamed `invoke.py`. A `dream.py` script wrapper remains
-    for backward compatibility.
-  - Completely new WebGUI - launch with `python3 scripts/invoke.py --web`
-  - Support for <a href="https://invoke-ai.github.io/InvokeAI/features/INPAINTING/">inpainting</a> and <a href="https://invoke-ai.github.io/InvokeAI/features/OUTPAINTING/">outpainting</a>
-  - img2img runs on all k* samplers
-  - Support for <a href="https://invoke-ai.github.io/InvokeAI/features/PROMPTS/#negative-and-unconditioned-prompts">negative prompts</a>
-  - Support for CodeFormer face reconstruction
-  - Support for Textual Inversion on Macintoshes
-  - Support in both WebGUI and CLI for <a href="https://invoke-ai.github.io/InvokeAI/features/POSTPROCESS/">post-processing of previously-generated images</a>
-    using facial reconstruction, ESRGAN upscaling, outcropping (similar to DALL-E infinite canvas),
-    and "embiggen" upscaling. See the `!fix` command.
-  - New `--hires` option on `invoke>` line allows <a href="https://invoke-ai.github.io/InvokeAI/features/CLI/#txt2img">larger images to be created without duplicating elements</a>, at the cost of some performance.
-  - New `--perlin` and `--threshold` options allow you to add and control variation
-    during image generation (see <a href="https://github.com/invoke-ai/InvokeAI/blob/main/docs/features/OTHER.md#thresholding-and-perlin-noise-initialization-options">Thresholding and Perlin Noise Initialization</a>
-  - Extensive metadata now written into PNG files, allowing reliable regeneration of images
-    and tweaking of previous settings.
-  - Command-line completion in `invoke.py` now works on Windows, Linux and Mac platforms.
-  - Improved <a href="https://invoke-ai.github.io/InvokeAI/features/CLI/">command-line completion behavior</a>.
-    New commands added:
-    - List command-line history with `!history`
-    - Search command-line history with `!search`
-    - Clear history with `!clear`
-  - Deprecated `--full_precision` / `-F`. Simply omit it and `invoke.py` will auto
-    configure. To switch away from auto use the new flag like `--precision=float32`.
-
-For older changelogs, please visit the **[CHANGELOG](https://invoke-ai.github.io/InvokeAI/CHANGELOG#v114-11-september-2022)**.
+For our latest changes, view our [Release Notes](https://github.com/invoke-ai/InvokeAI/releases)
 
 ### Troubleshooting
 
@@ -172,14 +161,22 @@ problems and other issues.
 # Contributing
 
 Anyone who wishes to contribute to this project, whether documentation, features, bug fixes, code
-cleanup, testing, or code reviews, is very much encouraged to do so. If you are unfamiliar with how
-to contribute to GitHub projects, here is a
-[Getting Started Guide](https://opensource.com/article/19/7/create-pull-request-github).
+cleanup, testing, or code reviews, is very much encouraged to do so. 
 
-A full set of contribution guidelines, along with templates, are in progress, but for now the most
+To join, just raise your hand on the InvokeAI Discord server (#dev-chat) or the GitHub discussion board. 
+
+If you are unfamiliar with how
+to contribute to GitHub projects, here is a
+[Getting Started Guide](https://opensource.com/article/19/7/create-pull-request-github). A full set of contribution guidelines, along with templates, are in progress, but for now the most
 important thing is to **make your pull request against the "development" branch**, and not against
 "main". This will help keep public breakage to a minimum and will allow you to propose more radical
 changes.
+
+We hope you enjoy using our software as much as we enjoy creating it,
+and we hope that some of those of you who are reading this will elect
+to become part of our community.
+
+Welcome to InvokeAI!
 
 ### Contributors
 

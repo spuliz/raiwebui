@@ -56,7 +56,7 @@ unofficial Stable Diffusion models and where they can be obtained.
 
 There are three ways to install weights files:
 
-1. During InvokeAI installation, the `preload_models.py` script can download
+1. During InvokeAI installation, the `configure_invokeai.py` script can download
    them for you.
 
 2. You can use the command-line interface (CLI) to import, configure and modify
@@ -65,13 +65,13 @@ There are three ways to install weights files:
 3. You can download the files manually and add the appropriate entries to
    `models.yaml`.
 
-### Installation via `preload_models.py`
+### Installation via `configure_invokeai.py`
 
-This is the most automatic way. Run `scripts/preload_models.py` from the
+This is the most automatic way. Run `scripts/configure_invokeai.py` from the
 console. It will ask you to select which models to download and lead you through
 the steps of setting up a Hugging Face account if you haven't done so already.
 
-To start, run `python scripts/preload_models.py` from within the InvokeAI:
+To start, run `python scripts/configure_invokeai.py` from within the InvokeAI:
 directory
 
 !!! example ""
@@ -162,6 +162,12 @@ the command-line client's `!import_model` command.
          Type a bit of the path name and hit ++tab++ in order to get a choice of
          possible completions.
 
+    !!! tip "on Windows, you can drag model files onto the command-line"
+
+         Once you have typed in `!import_model `, you can drag the model `.ckpt` file
+         onto the command-line to insert the model path. This way, you don't need to
+         type it or copy/paste.
+
 4.  Follow the wizard's instructions to complete installation as shown in the
     example here:
 
@@ -238,7 +244,7 @@ arabian-nights-1.0:
 | arabian-nights-1.0 | This is the name of the model that you will refer to from within the CLI and the WebGUI when you need to load and use the model.                                                                                                                                                                                                                                                                                                                                                                                                  |
 | description        | Any description that you want to add to the model to remind you what it is.                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | weights            | Relative path to the .ckpt weights file for this model.                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| config             | This is the confusingly-named configuration file for the model itself. Use `./configs/stable-diffusion/v1-inference.yaml` unless the model happens to need a custom configuration, in which case the place you downloaded it from will tell you what to use instead. For example, the runwayML custom inpainting model requires the file `configs/stable-diffusion/v1-inpainting-inference.yaml`. This is already inclued in the InvokeAI distribution and is configured automatically for you by the `preload_models.py` script. |
+| config             | This is the confusingly-named configuration file for the model itself. Use `./configs/stable-diffusion/v1-inference.yaml` unless the model happens to need a custom configuration, in which case the place you downloaded it from will tell you what to use instead. For example, the runwayML custom inpainting model requires the file `configs/stable-diffusion/v1-inpainting-inference.yaml`. This is already inclued in the InvokeAI distribution and is configured automatically for you by the `configure_invokeai.py` script. |
 | vae                | If you want to add a VAE file to the model, then enter its path here.                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | width, height      | This is the width and height of the images used to train the model. Currently they are always 512 and 512.                                                                                                                                                                                                                                                                                                                                                                                                                        |
 

@@ -2,16 +2,51 @@ InvokeAI
 
 Project homepage: https://github.com/invoke-ai/InvokeAI
 
-Installation on Windows:
-    NOTE: You might need to enable Windows Long Paths. If you're not sure,
-    then you almost certainly need to. Simply double-click the 'WinLongPathsEnabled.reg'
-    file. Note that you will need to have admin privileges in order to
-    do this.
+Preparations:
 
-    Please double-click the 'install.bat' file (while keeping it inside the invokeAI folder).
+  You will need to install Python 3.9 or higher for this installer
+  to work. Instructions are given here:
+  https://invoke-ai.github.io/InvokeAI/installation/INSTALL_AUTOMATED/
 
-Installation on Linux and Mac:
-    Please open the terminal, and run './install.sh' (while keeping it inside the invokeAI folder).
+  Before you start the installer, please open up your system's command
+  line window (Terminal or Command) and type the commands:
 
-After installation, please run the 'invoke.bat' file (on Windows) or 'invoke.sh'
-file (on Linux/Mac) to start InvokeAI.
+     python --version
+
+  If all is well, it will print "Python 3.X.X", where the version number
+  is at least 3.9.1
+
+  If this works, check the version of the Python package manager, pip:
+
+     pip --version
+
+  You should get a message that indicates that the pip package
+  installer was derived from Python 3.9 or 3.10. For example:
+  "pip 22.3.1 from /usr/bin/pip (python 3.9)"
+
+Long Paths on Windows:
+
+  If you are on Windows, you will need to enable Windows Long Paths to
+  run InvokeAI successfully. If you're not sure what this is, you
+  almost certainly need to do this.
+
+  Simply double-click the "WinLongPathsEnabled.reg" file located in
+  this directory, and approve the Windows warnings. Note that you will
+  need to have admin privileges in order to do this.
+
+Launching the installer:
+
+  Windows: double-click the 'install.bat' file (while keeping it inside
+  the InvokeAI-Installer folder).
+
+  Linux and Mac: Please open the terminal application and run
+  './install.sh' (while keeping it inside the InvokeAI-Installer
+  folder).
+
+The installer will create a directory named "invokeai" in the folder
+of your choice. This directory contains everything you need to run
+invokeai. Once InvokeAI is up and running, you may delete the
+InvokeAI-Installer folder at your convenience.
+
+For more information, please see
+https://invoke-ai.github.io/InvokeAI/installation/INSTALL_AUTOMATED/

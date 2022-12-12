@@ -194,10 +194,13 @@ checkpoints
 
 # Let the frontend manage its own gitignore
 !frontend/*
+<<<<<<< HEAD
 frontend/apt-get
 #frontend/dist
 frontend/sudo
 frontend/update
+=======
+>>>>>>> upstream/main
 
 # Scratch folder
 .scratch/
@@ -218,7 +221,7 @@ models/clipseg
 models/gfpgan
 
 # ignore initfile
-invokeai.init
+.invokeai
 
 # ignore environment.yml and requirements.txt
 # these are links to the real files in environments-and-requirements
@@ -226,12 +229,14 @@ environment.yml
 requirements.txt
 
 # source installer files
-source_installer/*zip
-source_installer/invokeAI
-install.bat
-install.sh
-update.bat
-update.sh
+installer/*zip
+installer/install.bat
+installer/install.sh
+installer/update.bat
+installer/update.sh
 
 # this may be present if the user created a venv
 invokeai
+
+# no longer stored in source directory
+models

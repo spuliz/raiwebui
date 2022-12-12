@@ -111,7 +111,7 @@ will do our best to help.
 
 !!! todo "Download the model weight files"
 
-    The `preload_models.py` script downloads and installs the model weight
+    The `configure_invokeai.py` script downloads and installs the model weight
     files for you. It will lead you through the process of getting a Hugging Face
     account, accepting the Stable Diffusion model weight license agreement, and
     creating a download token:
@@ -119,7 +119,7 @@ will do our best to help.
     ```bash
     # This will take some time, depending on the speed of your internet connection
     # and will consume about 10GB of space
-    python scripts/preload_models.py
+    python scripts/configure_invokeai.py
     ```
 
 !!! todo "Run InvokeAI!"
@@ -150,7 +150,7 @@ will do our best to help.
     To use an alternative model you may invoke the `!switch` command in
     the CLI, or pass `--model <model_name>` during `invoke.py` launch for
     either the CLI or the Web UI. See [Command Line
-    Client](../features/CLI.md#model-selection-and-importation). The
+    Client](../../features/CLI.md#model-selection-and-importation). The
     model names are defined in `configs/models.yaml`.
 
 ---
@@ -220,8 +220,8 @@ There are several causes of these errors:
    with "(invokeai)" then you activated it. If it begins with "(base)" or
    something else you haven't.
 
-2. You might've run `./scripts/preload_models.py` or `./scripts/invoke.py`
-   instead of `python ./scripts/preload_models.py` or
+2. You might've run `./scripts/configure_invokeai.py` or `./scripts/invoke.py`
+   instead of `python ./scripts/configure_invokeai.py` or
    `python ./scripts/invoke.py`. The cause of this error is long so it's below.
 
     <!-- I could not find out where the error is, otherwise would have marked it as a footnote -->
@@ -359,7 +359,7 @@ python ./scripts/txt2img.py \
 ### OSError: Can't load tokenizer for 'openai/clip-vit-large-patch14'
 
 ```bash
-python scripts/preload_models.py
+python scripts/configure_invokeai.py
 ```
 
 ---

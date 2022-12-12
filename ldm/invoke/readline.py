@@ -12,12 +12,15 @@ import os
 import re
 import atexit
 from ldm.invoke.args import Args
+from ldm.invoke.concepts_lib import Concepts
+from ldm.invoke.globals import Globals
 
 # ---------------readline utilities---------------------
 try:
     import readline
     readline_available = True
-except (ImportError,ModuleNotFoundError):
+except (ImportError,ModuleNotFoundError) as e:
+    print(f'** An error occurred when loading the readline module: {str(e)}')
     readline_available = False
 
 IMG_EXTENSIONS     = ('.png','.jpg','.jpeg','.PNG','.JPG','.JPEG','.gif','.GIF')
@@ -50,7 +53,6 @@ COMMANDS = (
     '--codeformer_fidelity','-cf',
     '--upscale','-U',
     '-save_orig','--save_original',
-    '--skip_normalize','-x',
     '--log_tokenization','-t',
     '--hires_fix',
     '--inpaint_replace','-r',
@@ -83,6 +85,7 @@ IMG_FILE_COMMANDS=(
     '--init_color[=\s]',
     '--embedding_path[=\s]',
     )
+
 path_regexp   = '(' + '|'.join(IMG_PATH_COMMANDS+IMG_FILE_COMMANDS) + ')\s*\S*$'
 weight_regexp = '(' + '|'.join(WEIGHT_COMMANDS) + ')\s*\S*$'
 text_regexp = '(' + '|'.join(TEXT_PATH_COMMANDS) + ')\s*\S*$'
@@ -97,6 +100,8 @@ class Completer(object):
         self.linebuffer  = None
         self.auto_history_active = True
         self.extensions = None
+        self.concepts = None
+        self.embedding_terms = set()
         return
 
     def complete(self, text, state):
@@ -111,22 +116,30 @@ class Completer(object):
             # extensions defined, so go directly into path completion mode
             if self.extensions is not None:
                 self.matches = self._path_completions(text, state, self.extensions)
-                
+
             # looking for an image file
             elif re.search(path_regexp,buffer):
                 do_shortcut = re.search('^'+'|'.join(IMG_FILE_COMMANDS),buffer)
                 self.matches = self._path_completions(text, state, IMG_EXTENSIONS,shortcut_ok=do_shortcut)
 
             # looking for a seed
-            elif re.search('(-S\s*|--seed[=\s])\d*$',buffer): 
+            elif re.search('(-S\s*|--seed[=\s])\d*$',buffer):
                 self.matches= self._seed_completions(text,state)
+
+            elif re.search('<[\w-]*$',buffer):
+                self.matches= self._concept_completions(text,state)
 
             # looking for a model
             elif re.match('^'+'|'.join(MODEL_COMMANDS),buffer):
                 self.matches= self._model_completions(text, state)
 
             elif re.search(weight_regexp,buffer):
-                self.matches = self._path_completions(text, state, WEIGHT_EXTENSIONS)
+                self.matches = self._path_completions(
+                    text,
+                    state,
+                    WEIGHT_EXTENSIONS,
+                    default_dir=Globals.root,
+                )
 
             elif re.search(text_regexp,buffer):
                 self.matches = self._path_completions(text, state, TEXT_EXTENSIONS)
@@ -187,6 +200,9 @@ class Completer(object):
     def set_default_dir(self, path):
         self.default_dir=path
 
+    def set_options(self,options):
+        self.options = options
+
     def get_line(self,index):
         try:
             line = self.get_history_item(index)
@@ -210,7 +226,7 @@ class Completer(object):
         if h_len < 1:
             print('<empty history>')
             return
-        
+
         for i in range(0,h_len):
             line = self.get_history_item(i+1)
             if match and match not in line:
@@ -253,6 +269,27 @@ class Completer(object):
         matches.sort()
         return matches
 
+    def add_embedding_terms(self, terms:list[str]):
+        self.embedding_terms = set(terms)
+        if self.concepts:
+            self.embedding_terms.update(self.concepts)
+
+    def _concept_completions(self, text, state):
+        if self.concepts is None:
+            self.concepts = set(Concepts().list_concepts())
+            self.embedding_terms.update(self.concepts)
+
+        partial = text[1:]  # this removes the leading '<'
+        if len(partial) == 0:
+            return list(self.embedding_terms)  # whole dump - think if user wants this!
+
+        matches = list()
+        for concept in self.embedding_terms:
+            if concept.startswith(partial):
+                matches.append(f'<{concept}>')
+        matches.sort()
+        return matches
+
     def _model_completions(self, text, state):
         m = re.search('(!switch\s+)(\w*)',text)
         if m:
@@ -274,7 +311,7 @@ class Completer(object):
             readline.redisplay()
             self.linebuffer = None
 
-    def _path_completions(self, text, state, extensions, shortcut_ok=True):
+    def _path_completions(self, text, state, extensions, shortcut_ok=True, default_dir:str=''):
         # separate the switch from the partial path
         match = re.search('^(-\w|--\w+=?)(.*)',text)
         if match is None:
@@ -282,8 +319,8 @@ class Completer(object):
             partial_path = text
         else:
             switch,partial_path  = match.groups()
-        partial_path = partial_path.lstrip()
 
+        partial_path = partial_path.lstrip()
 
         matches = list()
         path = os.path.expanduser(partial_path)
@@ -293,7 +330,7 @@ class Completer(object):
         elif os.path.dirname(path) != '':
             dir = os.path.dirname(path)
         else:
-            dir = ''
+            dir = default_dir if os.path.exists(default_dir)  else ''
             path= os.path.join(dir,path)
 
         dir_list = os.listdir(dir or '.')
@@ -308,7 +345,7 @@ class Completer(object):
             if not (node.endswith(extensions) or os.path.isdir(full_path)):
                 continue
 
-            if not full_path.startswith(path):
+            if path and not full_path.startswith(path):
                 continue
 
             if switch is None:
@@ -329,7 +366,7 @@ class DummyCompleter(Completer):
     def __init__(self,options):
         super().__init__(options)
         self.history = list()
-        
+
     def add_history(self,line):
         self.history.append(line)
 
@@ -347,6 +384,21 @@ class DummyCompleter(Completer):
 
     def set_line(self,line):
         print(f'# {line}')
+
+def generic_completer(commands:list)->Completer:
+    if readline_available:
+        completer = Completer(commands,[])
+        readline.set_completer(completer.complete)
+        readline.set_pre_input_hook(completer._pre_input_hook)
+        readline.set_completer_delims(' ')
+        readline.parse_and_bind('tab: complete')
+        readline.parse_and_bind('set print-completions-horizontally off')
+        readline.parse_and_bind('set page-completions on')
+        readline.parse_and_bind('set skip-completed-text on')
+        readline.parse_and_bind('set show-all-if-ambiguous on')
+    else:
+        completer = DummyCompleter(commands)
+    return completer
 
 def get_completer(opt:Args, models=[])->Completer:
     if readline_available:
@@ -369,12 +421,20 @@ def get_completer(opt:Args, models=[])->Completer:
         readline.parse_and_bind('set skip-completed-text on')
         readline.parse_and_bind('set show-all-if-ambiguous on')
 
-        histfile = os.path.join(os.path.expanduser(opt.outdir), '.invoke_history')
+        outdir = os.path.expanduser(opt.outdir)
+        if os.path.isabs(outdir):
+            histfile = os.path.join(outdir,'.invoke_history')
+        else:
+            histfile = os.path.join(Globals.root, outdir, '.invoke_history')
         try:
             readline.read_history_file(histfile)
             readline.set_history_length(1000)
         except FileNotFoundError:
             pass
+        except OSError: # file likely corrupted
+            newname = f'{histfile}.old'
+            print(f'## Your history file {histfile} couldn\'t be loaded and may be corrupted. Renaming it to {newname}')
+            os.replace(histfile,newname)
         atexit.register(readline.write_history_file, histfile)
 
     else:

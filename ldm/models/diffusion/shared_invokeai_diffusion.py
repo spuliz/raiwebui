@@ -4,8 +4,9 @@ from typing import Callable, Optional, Union
 
 import torch
 
-from ldm.models.diffusion.cross_attention_control import CrossAttentionControl
-from ldm.modules.attention import get_mem_free_total
+from ldm.models.diffusion.cross_attention_control import Arguments, \
+    remove_cross_attention_control, setup_cross_attention_control, Context, get_cross_attention_modules, CrossAttentionType
+from ldm.models.diffusion.cross_attention_map_saving import AttentionMapSaver
 
 
 class InvokeAIDiffuserComponent:
@@ -20,7 +21,8 @@ class InvokeAIDiffuserComponent:
 
 
     class ExtraConditioningInfo:
-        def __init__(self, cross_attention_control_args: Optional[CrossAttentionControl.Arguments]):
+        def __init__(self, tokens_count_including_eos_bos:int, cross_attention_control_args: Optional[Arguments]):
+            self.tokens_count_including_eos_bos = tokens_count_including_eos_bos
             self.cross_attention_control_args = cross_attention_control_args
 
         @property
@@ -40,18 +42,36 @@ class InvokeAIDiffuserComponent:
 
     def setup_cross_attention_control(self, conditioning: ExtraConditioningInfo, step_count: int):
         self.conditioning = conditioning
-        self.cross_attention_control_context = CrossAttentionControl.Context(
+        self.cross_attention_control_context = Context(
             arguments=self.conditioning.cross_attention_control_args,
             step_count=step_count
         )
-        CrossAttentionControl.setup_cross_attention_control(self.model, self.cross_attention_control_context)
+        setup_cross_attention_control(self.model, self.cross_attention_control_context)
 
     def remove_cross_attention_control(self):
         self.conditioning = None
         self.cross_attention_control_context = None
-        CrossAttentionControl.remove_cross_attention_control(self.model)
+        remove_cross_attention_control(self.model)
 
+    def setup_attention_map_saving(self, saver: AttentionMapSaver):
+        def callback(slice, dim, offset, slice_size, key):
+            if dim is not None:
+                # sliced tokens attention map saving is not implemented
+                return
+            saver.add_attention_maps(slice, key)
 
+        tokens_cross_attention_modules = get_cross_attention_modules(self.model, CrossAttentionType.TOKENS)
+        for identifier, module in tokens_cross_attention_modules:
+            key = ('down' if identifier.startswith('down') else
+                   'up' if identifier.startswith('up') else
+                   'mid')
+            module.set_attention_slice_calculated_callback(
+                lambda slice, dim, offset, slice_size, key=key: callback(slice, dim, offset, slice_size, key))
+
+    def remove_attention_map_saving(self):
+        tokens_cross_attention_modules = get_cross_attention_modules(self.model, CrossAttentionType.TOKENS)
+        for _, module in tokens_cross_attention_modules:
+            module.set_attention_slice_calculated_callback(None)
 
     def do_diffusion_step(self, x: torch.Tensor, sigma: torch.Tensor,
                                 unconditioning: Union[torch.Tensor,dict],
@@ -71,7 +91,7 @@ class InvokeAIDiffuserComponent:
 
 
         cross_attention_control_types_to_do = []
-        context: CrossAttentionControl.Context = self.cross_attention_control_context
+        context: Context = self.cross_attention_control_context
         if self.cross_attention_control_context is not None:
             percent_through = self.estimate_percent_through(step_index, sigma)
             cross_attention_control_types_to_do = context.get_active_cross_attention_control_types_for_step(percent_through)
@@ -133,7 +153,7 @@ class InvokeAIDiffuserComponent:
         # representing batched uncond + cond, but then when it comes to applying the saved attention, the
         # wrangler gets an attention tensor which only has shape[0]=8, representing just self.edited_conditionings.)
         # todo: give CrossAttentionControl's `wrangler` function more info so it can work with a batched call as well.
-        context:CrossAttentionControl.Context = self.cross_attention_control_context
+        context:Context = self.cross_attention_control_context
 
         try:
             unconditioned_next_x = self.model_forward_callback(x, sigma, unconditioning)
