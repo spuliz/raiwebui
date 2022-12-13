@@ -1,5 +1,7 @@
 FROM ubuntu:22.10
 
+#test
+
 # use bash
 SHELL [ "/bin/bash", "-c" ]
 
