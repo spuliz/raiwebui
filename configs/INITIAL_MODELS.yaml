@@ -26,7 +26,7 @@ pvh_bag_1:
   description: Stable Diffusion inference model version 1.4
   repo_id: rocketai/pvh_bag_1
   config: v1-inference.yaml
-  file: pvh_bag_1_model.ckpt
+  file: model.ckpt
   recommended: True
   width: 512
   height: 512
@@ -35,13 +35,13 @@ pvh_bag_2:
   repo_id: rocketai/pvh_bag_2
   config: v1-inference.yaml
   recommended: False
-  file: pvh_bag_2_model.ckpt
+  file: model.ckpt
   width: 512
   height: 512
 pvh_shoes_1:
   description: Stable Diffusion inference model version 1.4
   repo_id: rocketai/pvh_shoes_1
-  file: pvh_shoes_1_model.ckpt
+  file: model.ckpt
   config: v1-inference.yaml
   recommended: False
   width: 512
